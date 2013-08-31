@@ -1,5 +1,3 @@
-noticeboard
-==================
 ![](screen.png)
 
 A noticeboard web-app built using django.
