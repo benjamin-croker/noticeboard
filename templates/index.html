@@ -4,154 +4,158 @@
     <meta charset="utf-8">
     <title>Noticeboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Noticeboard">
+    <meta name="author" content="Ben Croker">
 
-    <link href="{{ STATIC_URL }}bootstrap.min.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}bootstrap.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}bootstrap-responsive.css" rel="stylesheet">
 
+    <style type="text/css">
+     /* body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }*/
+      .masthead {
+        background-image:url('{{ STATIC_URL }}header_background.png');
+        border-radius: 0px;
+      }
+
+      .notice {
+        border-radius: 5px;
+        background-color: #eee8d5;
+        padding:10px;
+      }
+
+      .notice-holder {
+        padding-top:10px;
+        padding-bottom:10px;
+      }
+      [class^="icon-"] { background-image: url("{{ STATIC_URL }}glyphicons-halflings.png"); }
+    </style>
+    
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <style type="text/css">
-      @font-face {
-      font-family: 'Glyphicons Halflings';
-      src: url('{{ STATIC_URL }}glyphicons-halflings-regular.eot');
-      src: url('{{ STATIC_URL }}glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
-        url('{{ STATIC_URL }}glyphicons-halflings-regular.woff') format('woff'),
-        url('{{ STATIC_URL }}glyphicons-halflings-regular.ttf') format('truetype'),
-        url('{{ STATIC_URL }}glyphicons-halflings-regular.svg#glyphicons-halflingsregular') format('svg');
-      }
-
-      .jumbotron-masthead {
-        background-image:url('{{ STATIC_URL }}header_background.png');
-      }
-    </style>
 
   </head>
 
   <body>
-    <div class="jumbotron jumbotron-masthead">
-    <div class="container-narrow", style="text-align:center">
-      <h1 style="color:#EEEEEE">Noticeboard</h1>
-      <button type="button", class="btn btn-success btn-lg", onClick="new_notice()">Write a New Notice</button>
-    </div>
+    <div class="hero-unit masthead">
+      <div class="container-narrow", style="text-align:center">
+        <h1 style="color:#EEEEEE">Noticeboard</h1>
+        <p></p>
+        <button type="button", class="btn btn-success btn-lg", onClick="new_notice()">Write a New Notice</button>
+      </div>
     </div>
 
     <div class="container">
 
 
-      <!-- Old notices -->
+            <!-- Old notices -->
       {% if noticeList %}
       {% for notice in noticeList %}
       
       {% if forloop.counter0|divisibleby:3 %}
       <div class="row">
       {% endif %}
-        <div class="col-md-4", style="padding:10px;">
-        <div class="jumbotron", style="background-color:#eee8d5">
+        <div class="span4 notice-holder">
+        <div class="span3 notice">
           <div class="row">
+            <div class="span3">
             <p>{{ notice.notice|linebreaksbr }}</p>
             <div id="note{{ notice.id }}", class="hidden">{{notice.notice}}</div>
+            </div>
           </div>
           
-          <div class="row pull-right">
-            <button type="button" class="btn btn-link" onclick="delete_notice('/notices/{{ notice.id }}/delete/')"><span class="glyphicon glyphicon-trash"></span></button>
-            <button type="button" class="btn btn-link info_button" data-title="Posted" data-content="{{ notice.pub_date }}"><span class="glyphicon glyphicon-time"></span></button>
-            <button type="button" class="btn btn-link" onclick="edit_notice(note{{ notice.id }}, '/notices/{{ notice.id }}/edit/')"><span class="glyphicon glyphicon-pencil"></span></button>
+          <div class="row">
+            <div class="span3">
+              <a class="btn btn-link pull-right" onclick="delete_notice('/notices/{{ notice.id }}/delete/')"><i class="icon-trash"></i></a>
+              <a class="btn btn-link info_button pull-right" data-title="Posted" data-content="{{ notice.pub_date }}"><i class="icon-time"></i></a>
+              <a class="btn btn-link pull-right" onclick="edit_notice(note{{ notice.id }}, '/notices/{{ notice.id }}/edit/')"><i class="icon-pencil"></i></a>
+            </div>
           </div>
+
         </div>
         </div>
         {% if forloop.counter|divisibleby:3 or forloop.last%}</div>{% endif %}
         {% endfor %}
       {% endif %}
+      <hr>
 
     </div> <!-- container -->
        
     <!-- Confirm delete modal -->
-    <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-body">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h4 class="modal-title">Delete Notice</h4>
-          </div>
-      
-          <form action="#", method="post", id="deleteModalForm">
-          {% csrf_token %}
-
-          <div class="modal-footer">
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-              <button type="submit", class="btn btn-danger">Delete</button>
-          </div>
-          </form>
-        </div>
+    <div id="deleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Confirm Delete</h3>
       </div>
+      
+      <form action="#", method="post", id="deleteModalForm">
+      {% csrf_token %}
+      <div class="modal-body", style="float: right">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          <button type="submit", class="btn btn-danger">Delete</button>
+      </div>
+      </form>
     </div>
 
 
     <!-- Edit modal -->
-    <div id="editModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h4 class="modal-title">Edit Notice</h4>
-          </div>
-          
-          <form action="#", method="post", id="editModalForm">
-          {% csrf_token %}
-          <div class="modal-body">
-              <div class="row">
-                <div class="span5">
-                  <textarea class="form-control", rows="3", id="editModalTextarea", name="text_input"></textarea>
-                </div>
-              </div>
-          </div>
-
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button class="btn btn-primary" id="editModalSave">Save</button>
-          </div>
-          </form>
-        </div>
+    <div id="editModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Edit Notice</h3>
       </div>
+      
+      <form action="#", method="post", id="editModalForm">
+      {% csrf_token %}
+      <div class="modal-body">
+          <div class="row">
+            <div class="span5">
+              <textarea class="span5", rows="3", id="editModalTextarea", name="text_input"></textarea>
+            </div>
+          </div>
+      </div>
+      <div class="modal-body", style="float: right">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button class="btn btn-primary" id="editModalSave">Save</button>
+      </div>
+      </form>
     </div>
 
 
     <!-- New notice modal -->
-    <div id="newModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h4 class="modal-title">Write a New Notice</h4>
-          </div>
-
-          <form action="/notices/new/", method="post", id="newModalForm">
-          {% csrf_token %}
-          <div class="modal-body">
-              <div class="row">
-                <div class="span5">
-                  <textarea class="form-control", rows="3", id="newModalTextarea", name="text_input"></textarea>
-                </div>
-              </div>
-          </div>
-
-          <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button class="btn btn-success" id="newModalSave">Post</button>
-          </div>
-          </form>
-        </div>
+    <div id="newModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>New Notice</h3>
       </div>
+
+      <form action="/notices/new/", method="post", id="newModalForm">
+      {% csrf_token %}
+      <div class="modal-body">
+          <div class="row">
+            <div class="span5">
+              <textarea class="span5", rows="3", id="newModalTextarea", name="text_input"></textarea>
+            </div>
+          </div>
+      </div>
+      <div class="modal-body", style="float: right">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button class="btn btn-success" id="newModalSave">Post</button>
+      </div>
+      </form>
     </div>
 
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
     
     <script src="{{ STATIC_URL }}jquery-1.10.2.min.js"></script>
-    <script src="{{ STATIC_URL }}bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap.js"></script>
     
     <!-- Popover button function -->
     <script>  
