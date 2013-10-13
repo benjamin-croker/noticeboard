@@ -76,7 +76,6 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(SITE_ROOT, "media", "css"),
     os.path.join(SITE_ROOT, "media", "js"),
-    os.path.join(SITE_ROOT, "media", "fonts"),
     os.path.join(SITE_ROOT, "media", "img"),
 )
 
